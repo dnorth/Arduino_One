@@ -19,29 +19,47 @@ void setup()                                 // Built-in initialization block
 
   servoLeft.attach(13);                      // Attach left signal to pin 13
   servoRight.attach(12);                     // Attach right signal to pin 12
+  Serial.begin(9600);
 }  
+
+int count = 0;
  
 void loop()                                  // Main loop auto-repeats
 {
  
   int irLeft = irDetect(9, 10, 38000);       // Check for object on left
   int irRight = irDetect(2, 3, 38000);       // Check for object on right
-
-  if((irLeft == 0) && (irRight == 0))        // If both sides detect
+  Serial.print("Left: ");
+  Serial.println(irLeft);
+  
+  Serial.print("Right: ");
+  Serial.println(irRight);
+  
+  if(count > 3)
+  {
+    maneuver(-200, 200, 1200);
+    Serial.print("Backing up!!!!");
+    count = 0;
+  }
+  else if((irLeft == 0) && (irRight == 0))        // If both sides detect
   {
     maneuver(-200, -200, 20);                // Backward 20 milliseconds
+    count++;
   }
   else if(irLeft == 0)                       // If only left side detects
   {
     maneuver(200, -200, 20);                 // Right for 20 ms
+    count++;
   }
   else if(irRight == 0)                      // If only right side detects
   {
     maneuver(-200, 200, 20);                 // Left for 20 ms
+    count++;
   }
   else                                       // Otherwise, no IR detects
   {
     maneuver(200, 200, 20);                  // Forward 20 ms
+    count=0;
   }
 }
 
